@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="slides-format" content="viewport">
+    <title>Fyxical – NIH Grant & Clinical Trial Pitch</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-bg: #fafafa;
+            --color-bg-deep: #f5f5f5;
+            --color-surface: #ffffff;
+            --color-text: #111111;
+            --color-text-secondary: #333333;
+            --color-text-muted: #777777;
+            --color-accent-1: #E0176C;
+            --color-accent-2: #ff6aa7;
+            --color-accent-3: #b8004d;
+            --color-glass-bg: rgba(255,255,255,0.88);
+            --color-glass-border: rgba(224,23,108,0.12);
+            --color-vignette: rgba(0,0,0,0.04);
+            --font-display: 'DM Serif Display', Georgia, serif;
+            --font-body: 'Manrope', system-ui, sans-serif;
+        }
+    </style>
+    <style>
+        :root { --color-bg:#fafafa; --color-text:#111111; --glow-color-rgb:224,23,108; }
+        *,*::before,*::after{box-sizing:border-box;}
+        html,body{background:var(--color-bg);margin:0;}
+        body{font-family:'Manrope',system-ui,sans-serif;color:var(--color-text);overflow:hidden;height:100vh;width:100vw;}
+        .deck{width:100vw;height:100vh;position:relative;}
+        .slide{position:absolute;top:0;left:0;width:100%;height:100%;background:var(--color-bg);display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;transform:scale(0.96);transition:opacity 0.65s ease,transform 0.65s ease;pointer-events:none;overflow:hidden;}
+        .slide.active{opacity:1;transform:scale(1);pointer-events:all;}
+        .slide>.content{position:relative;z-index:2;width:100%;max-width:1080px;padding:clamp(1.2rem,3vw,3rem);}
+        .nav-controls{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:14px;z-index:100;background:rgba(255,255,255,0.84);backdrop-filter:blur(12px);padding:8px 22px;border-radius:40px;border:1px solid rgba(224,23,108,0.15);box-shadow:0 4px 20px rgba(0,0,0,0.06);}
+        .nav-btn{width:36px;height:36px;border:none;background:rgba(224,23,108,0.08);color:#E0176C;border-radius:50%;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s;}
+        .nav-btn:hover{background:rgba(224,23,108,0.18);}
+        .slide-dots{display:flex;gap:7px;}
+        .slide-dots .dot{width:9px;height:9px;border-radius:50%;background:rgba(224,23,108,0.18);cursor:pointer;transition:background 0.3s,transform 0.3s;}
+        .slide-dots .dot.active{background:#E0176C;transform:scale(1.35);}
+        .slide-counter{font-size:0.78rem;color:#777;min-width:38px;text-align:center;}
+        .reveal{opacity:0;transform:translateY(18px);}
+
+        @keyframes float-slow{0%{transform:translate(0,0) scale(1);}25%{transform:translate(55px,-45px) scale(1.1);}50%{transform:translate(-35px,38px) scale(0.92);}75%{transform:translate(45px,18px) scale(1.06);}100%{transform:translate(0,0) scale(1);}}
+        @keyframes float-drift{0%{transform:translate(0,0) scale(1) rotate(0deg);}33%{transform:translate(-48px,-55px) scale(1.12) rotate(3deg);}66%{transform:translate(38px,28px) scale(0.9) rotate(-2deg);}100%{transform:translate(0,0) scale(1) rotate(0deg);}}
+        @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-14px);}}
+        .gradient-mesh{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
+        .blob{position:absolute;border-radius:50%;filter:blur(70px);animation:float-slow 12s ease-in-out infinite;}
+        .blob:nth-child(2){animation:float-drift 16s ease-in-out infinite;}
+        .blob:nth-child(3){animation:float-slow 20s ease-in-out infinite reverse;}
+        .slide::after{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at center,transparent 55%,var(--color-vignette) 100%);}
+
+        @keyframes glow-pulse{0%,100%{text-shadow:0 0 18px rgba(224,23,108,0.35),0 0 28px rgba(224,23,108,0.12);}50%{text-shadow:0 0 30px rgba(224,23,108,0.55),0 0 48px rgba(224,23,108,0.20);}}
+        .glow-pulse{animation:glow-pulse 3s ease-in-out infinite;}
+
+        .bar-track{background:rgba(0,0,0,0.07);border-radius:8px;height:26px;position:relative;overflow:hidden;}
+        .bar-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,#333,#666);width:0%;transition:width 0.7s ease;}
+
+        .dark-slide{background:linear-gradient(135deg,#091828 0%,#0b3558 55%,#0d4f7a 100%)!important;}
+        .card-l{background:#fff;border:1px solid rgba(11,111,171,0.10);border-radius:14px;box-shadow:0 2px 16px rgba(0,0,0,0.055);}
+        .ab{border-left:4px solid #E0176C;}
+        .ab-t{border-left:4px solid #ccc;}
+        .ab-o{border-left:4px solid #aaa;}
+        .ab-r{border-left:4px solid #7C3AED;}
+        .pill{display:inline-flex;align-items:center;gap:6px;background:rgba(0,0,0,0.06);color:#555;border-radius:999px;padding:3px 12px;font-size:0.70rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;}
+        .stat-n{font-family:'DM Serif Display',serif;font-size:clamp(2rem,3.8vw,3.2rem);font-weight:400;color:#E0176C;line-height:1;}
+        .t-dot{width:13px;height:13px;border-radius:50%;background:#222;flex-shrink:0;box-shadow:0 0 6px rgba(0,0,0,0.25);}
+        .tl-line{position:absolute;left:18px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,#E0176C,#ff6aa7);}
+        @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.2s!important;}}
+    </style>
+</head>
+<body>
+<div class="mouse-spotlight" style="position:fixed;inset:0;z-index:99;pointer-events:none;"></div>
+<div class="deck"><!-- ══════════ SLIDE 1: TITLE ══════════ -->
+<div class="slide dark-slide active" data-slide="1">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:500px;height:500px;top:-100px;right:-80px;background:#E0176C;opacity:0.20;"></div>
+        <div class="blob" style="width:350px;height:350px;bottom:-90px;left:-60px;background:#ff6aa7;opacity:0.15;"></div>
+        <div class="blob" style="width:220px;height:220px;top:42%;left:16%;background:#b8004d;opacity:0.10;"></div>
+    </div>
+    <canvas class="particle-canvas" style="position:absolute;inset:0;z-index:1;"></canvas>
+    <div class="content text-center">
+        <div class="reveal" style="animation:float 3.4s ease-in-out infinite;margin-bottom:0.5rem;display:inline-block;">
+            <span style="font-family:'Manrope',sans-serif;font-weight:800;font-size:clamp(3rem,7vw,5.5rem);color:#ffffff;letter-spacing:-2px;line-height:1;">Fy</span><span style="font-family:'Manrope',sans-serif;font-weight:800;font-size:clamp(3rem,7vw,5.5rem);color:#E0176C;letter-spacing:-2px;line-height:1;">x</span><span style="font-family:'Manrope',sans-serif;font-weight:800;font-size:clamp(3rem,7vw,5.5rem);color:#ffffff;letter-spacing:-2px;line-height:1;">ical</span>
+        </div>
+        <p class="reveal" style="font-size:clamp(0.82rem,1.25vw,1.05rem);color:rgba(255,255,255,0.68);letter-spacing:5px;text-transform:uppercase;font-weight:600;margin-bottom:0.3rem;">From Symptoms to Solutions</p>
+        <p class="reveal" style="font-size:clamp(0.75rem,1.1vw,0.92rem);color:rgba(255,255,255,0.50);letter-spacing:2px;margin-bottom:1.4rem;">Rule-Based &amp; ML-Driven Exercise Pathway Classification for Low Back Pain</p>
+        <div class="reveal" style="display:inline-flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+            <span class="pill" style="background:rgba(255,255,255,0.14);color:#fff;">NIH Grant Proposal</span>
+            <span class="pill" style="background:rgba(224,23,108,0.28);color:#ffadd0;">Phase I Clinical Trial</span>
+            <span class="pill" style="background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.85);">HHS Partnership</span>
+        </div>
+        <p class="reveal" style="font-size:0.72rem;color:rgba(255,255,255,0.35);margin-top:1.2rem;letter-spacing:0.05em;">Anja Elaine Vidmar · Joshua Okafor · Curtis Mason · MSBA Capstone 2026</p>
+    </div>
+</div>
+
+<!-- ══════════ SLIDE 2: MEET THE TEAM ══════════ -->
+<div class="slide" data-slide="2">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:280px;height:280px;top:-50px;right:-44px;background:#E0176C;opacity:0.04;"></div>
+        <div class="blob" style="width:200px;height:200px;bottom:-42px;left:-32px;background:#E0176C;opacity:0.03;"></div>
+    </div>
+    <div class="content">
+        <div class="reveal"><span class="pill">The Fyxical Team</span></div>
+        <h2 class="font-display reveal" style="font-size:clamp(1.8rem,3.5vw,2.6rem);margin:0.5rem 0 1rem;color:#111;">Clinical Depth + Data Science + Global Operations</h2>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px;">
+            <div class="card-l reveal" style="padding:1.05rem;text-align:center;">
+                <div style="font-size:1.9rem;margin-bottom:6px;">🏥</div>
+                <div style="font-size:0.82rem;font-weight:700;color:#111;">Curtis Mason</div>
+                <div style="font-size:0.70rem;color:#6082a3;margin:3px 0;">Founder · Clinical Lead</div>
+                <div style="font-size:0.73rem;color:#444;">Orthopedic PT clinician-entrepreneur with clinic founding &amp; scaling experience; translates therapy outcomes into clinical algorithms and therapist-centric workflows</div>
+            </div>
+            <div class="card-l reveal" style="padding:1.05rem;text-align:center;">
+                <div style="font-size:1.9rem;margin-bottom:6px;">👩‍💻</div>
+                <div style="font-size:0.82rem;font-weight:700;color:#111;">Anja Elaine Vidmar</div>
+                <div style="font-size:0.70rem;color:#6082a3;margin:3px 0;">Co-Founder · Operations</div>
+                <div style="font-size:0.73rem;color:#444;">Operations &amp; go-to-market strategist; ETL pipeline, BigQuery + Vertex AI architecture; identifies process bottlenecks and positions POC for clinical adoption</div>
+            </div>
+            <div class="card-l reveal" style="padding:1.05rem;text-align:center;">
+                <div style="font-size:1.9rem;margin-bottom:6px;">🌍</div>
+                <div style="font-size:0.82rem;font-weight:700;color:#111;">Joshua Okafor</div>
+                <div style="font-size:0.70rem;color:#6082a3;margin:3px 0;">Co-Founder · Data Systems</div>
+                <div style="font-size:0.73rem;color:#444;">Global MERL &amp; data systems leader (USAID, Malaria Consortium); designs pipelines, validates algorithmic outputs, and builds evidence-driven decision-support infrastructure</div>
+            </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:13px;">
+            <div class="card-l ab reveal" style="padding:0.88rem 1.05rem;">
+                <div style="font-size:0.76rem;font-weight:700;color:#111;margin-bottom:4px;">⚠️ Critical Gaps (Acknowledged)</div>
+                <div style="font-size:0.73rem;color:#444;">Regulatory/HIPAA compliance, MLOps/data infrastructure, clinical UX design — addressed through fractional ML engineer, compliance consultant, and full-stack hire (Phase 1 hiring roadmap)</div>
+            </div>
+            <div class="card-l ab-t reveal" style="padding:0.88rem 1.05rem;">
+                <div style="font-size:0.76rem;font-weight:700;color:#111;margin-bottom:4px;">🏛️ Infrastructure</div>
+                <div style="font-size:0.73rem;color:#444;">fyxical.com domain owned; GitHub repo live; Vertex AI + BigQuery project <i>fyxical-poc</i> active; Looker dashboard published; GitHub Pages HTML dashboard live</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════ SLIDE 3: THE PROBLEM ══════════ -->
+<div class="slide" data-slide="3">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:320px;height:320px;top:-65px;right:-55px;background:#E0176C;opacity:0.04;"></div>
+        <div class="blob" style="width:210px;height:210px;bottom:-48px;left:-38px;background:#E0176C;opacity:0.03;"></div>
+    </div>
+    <div class="content">
+        <div class="reveal"><span class="pill">The Problem</span></div>
+        <h2 class="font-display reveal" style="font-size:clamp(1.8rem,3.6vw,2.7rem);margin:0.5rem 0 1.1rem;color:#111;">Low Back Pain Is Costly, Inconsistent, and Undertreated</h2>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:14px;">
+            <div class="card-l reveal" style="padding:1.1rem;text-align:center;">
+                <div class="stat-n glow-pulse" data-count="619">0</div>
+                <div style="font-size:0.69rem;text-transform:uppercase;letter-spacing:0.08em;color:#6082a3;margin-top:4px;font-weight:700;">Million People Affected<br>Worldwide (GBD)</div>
+            </div>
+            <div class="card-l reveal" style="padding:1.1rem;text-align:center;">
+                <div class="stat-n glow-pulse" style="color:#F97316;" data-count="134" data-prefix="$" data-suffix="B">$0B</div>
+                <div style="font-size:0.69rem;text-transform:uppercase;letter-spacing:0.08em;color:#6082a3;margin-top:4px;font-weight:700;">US Healthcare Spend<br>Per Year (JAMA)</div>
+            </div>
+            <div class="card-l reveal" style="padding:1.1rem;text-align:center;">
+                <div class="stat-n glow-pulse" style="color:#111;">#1</div>
+                <div style="font-size:0.69rem;text-transform:uppercase;letter-spacing:0.08em;color:#6082a3;margin-top:4px;font-weight:700;">Cause of Global<br>Disability (YLD)</div>
+            </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div class="card-l ab reveal" style="padding:0.95rem 1.1rem;">
+                <div style="font-size:0.80rem;font-weight:700;color:#111;margin-bottom:4px;">High Variability in Care</div>
+                <div style="font-size:0.76rem;color:#444;">Two clinicians treating the same condition may prescribe entirely different plans — leading to unpredictable outcomes, payer skepticism, and patient frustration.</div>
+            </div>
+            <div class="card-l ab-o reveal" style="padding:0.95rem 1.1rem;">
+                <div style="font-size:0.80rem;font-weight:700;color:#111;margin-bottom:4px;">Manual &amp; Time-Consuming</div>
+                <div style="font-size:0.76rem;color:#444;">Clinicians rely on memory, habit, and personal preference. Exercise libraries are large but not intelligently searchable — creating cognitive load and workflow friction.</div>
+            </div>
+            <div class="card-l ab-t reveal" style="padding:0.95rem 1.1rem;">
+                <div style="font-size:0.80rem;font-weight:700;color:#111;margin-bottom:4px;">No Real-Time Personalization</div>
+                <div style="font-size:0.76rem;color:#444;">Static treatment templates cannot adapt to how a patient actually responds. Chronic patients — 38.4% of our cohort — are the most costly and benefit most from adaptive logic.</div>
+            </div>
+            <div class="card-l ab-r reveal" style="padding:0.95rem 1.1rem;">
+                <div style="font-size:0.80rem;font-weight:700;color:#111;margin-bottom:4px;">Equity Gap</div>
+                <div style="font-size:0.76rem;color:#444;">Manual labor workers show 25.6% "crippled" ODI rates vs. 17.7% for acute patients. Care disparities across occupation, age, and demographics go undetected without monitoring.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════ SLIDE 4: OUR SOLUTION ══════════ -->
+<div class="slide" data-slide="4">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:300px;height:300px;top:-58px;left:-48px;background:#E0176C;opacity:0.03;"></div>
+        <div class="blob" style="width:200px;height:200px;bottom:-46px;right:-36px;background:#E0176C;opacity:0.03;"></div>
+    </div>
+    <div class="content">
+        <div class="reveal"><span class="pill">Our Solution</span></div>
+        <h2 class="font-display reveal" style="font-size:clamp(1.8rem,3.5vw,2.6rem);margin:0.5rem 0 0.4rem;color:#111;">Fyxical: AI-Driven Exercise Pathway Engine for Outpatient PT</h2>
+        <p class="reveal" style="font-size:0.82rem;color:#444;margin-bottom:1.1rem;">A health-tech decision-support platform that matches patients to evidence-informed exercise pathways at intake — keeping the <b>therapist in the loop</b> while eliminating guesswork.</p>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:12px;">
+            <div class="card-l reveal" style="padding:1.05rem;text-align:center;">
+                <div style="font-size:1.9rem;margin-bottom:7px;">🔬</div>
+                <div style="font-size:0.80rem;font-weight:700;color:#111;margin-bottom:5px;">Patient Similarity Engine</div>
+                <div style="font-size:0.74rem;color:#444;">Multi-dimensional matching on demographics, diagnosis codes, baseline function, comorbidities, and prior response trajectories</div>
+            </div>
+            <div class="card-l reveal" style="padding:1.05rem;text-align:center;">
+                <div style="font-size:1.9rem;margin-bottom:7px;">🤖</div>
+                <div style="font-size:0.80rem;font-weight:700;color:#111;margin-bottom:5px;">Rule + ML Engine</div>
+                <div style="font-size:0.74rem;color:#444;">Rule-based pathway triage (4 pathways) validated by logistic regression — 81% model agreement on held-out test set; SHAP explainability for every recommendation</div>
+            </div>
+            <div class="card-l reveal" style="padding:1.05rem;text-align:center;">
+                <div style="font-size:1.9rem;margin-bottom:7px;">📊</div>
+                <div style="font-size:0.80rem;font-weight:700;color:#111;margin-bottom:5px;">Clinician Dashboard</div>
+                <div style="font-size:0.74rem;color:#444;">Looker Studio interactive dashboard showing pathway distributions, equity monitoring, subgroup outcomes, and ML predictions — connected to BigQuery</div>
+            </div>
+        </div>
+        <div class="card-l ab-t reveal" style="padding:0.95rem 1.2rem;display:flex;align-items:center;gap:12px;">
+            <div style="font-size:1.5rem;">☁️</div>
+            <div><span style="font-size:0.78rem;font-weight:700;color:#111;">GCP Cloud-Native Stack: </span><span style="font-size:0.76rem;color:#444;">BigQuery → Vertex AI Workbench (5-notebook pipeline) → Looker Studio, version-controlled on GitHub. Reproducible, auditable, and ready for EHR integration.</span></div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════ SLIDE 5: THE DATA & COHORT ══════════ -->
+<div class="slide" data-slide="5">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:280px;height:280px;top:-50px;right:-45px;background:#E0176C;opacity:0.04;"></div>
+        <div class="blob" style="width:200px;height:200px;bottom:-42px;left:-32px;background:#E0176C;opacity:0.03;"></div>
+    </div>
+    <div class="content">
+        <div class="reveal"><span class="pill">Data &amp; Cohort</span></div>
+        <h2 class="font-display reveal" style="font-size:clamp(1.8rem,3.5vw,2.6rem);margin:0.5rem 0 1rem;color:#111;">500-Patient Synthetic Cohort — Clinically Grounded</h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+            <div style="display:flex;flex-direction:column;gap:11px;">
+                <div class="card-l ab reveal" style="padding:0.9rem 1.05rem;">
+                    <div style="font-size:0.78rem;font-weight:700;color:#111;margin-bottom:3px;">Dataset Sources</div>
+                    <div style="font-size:0.74rem;color:#444;">Calibrated to MEPS demographics, CDC LBP prevalence data, and Modified Oswestry Disability Index clinical standards. 500 adults with LBP across acute, subacute, and chronic episodes.</div>
+                </div>
+                <div class="card-l ab-t reveal" style="padding:0.9rem 1.05rem;">
+                    <div style="font-size:0.78rem;font-weight:700;color:#111;margin-bottom:3px;">Key Variables (4 Intake Features)</div>
+                    <div style="display:flex;flex-direction:column;gap:4px;margin-top:4px;">
+                        <div style="font-size:0.73rem;color:#444;padding:3px 8px;background:rgba(11,111,171,0.06);border-radius:5px;">Pain duration (weeks → Acute / Subacute / Chronic)</div>
+                        <div style="font-size:0.73rem;color:#444;padding:3px 8px;background:rgba(11,111,171,0.06);border-radius:5px;">Pain severity — VAS 0–10</div>
+                        <div style="font-size:0.73rem;color:#444;padding:3px 8px;background:rgba(11,111,171,0.06);border-radius:5px;">Oswestry Disability Index % (10-domain composite)</div>
+                        <div style="font-size:0.73rem;color:#444;padding:3px 8px;background:rgba(52,201,176,0.08);border-radius:5px;">Work-related injury status</div>
+                    </div>
+                </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:11px;">
+                <div class="card-l reveal" style="padding:0.9rem 1.05rem;">
+                    <div style="font-size:0.78rem;font-weight:700;color:#111;margin-bottom:8px;">Cohort Profile</div>
+                    <div style="display:flex;flex-direction:column;gap:7px;">
+                        <div>
+                            <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:#444;margin-bottom:3px;"><span>Chronic patients (duration &gt;12 wks)</span><span style="font-weight:700;color:#0B6FAB;">38.4%</span></div>
+                            <div class="bar-track"><div class="bar-fill" data-width="38"></div></div>
+                        </div>
+                        <div>
+                            <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:#444;margin-bottom:3px;"><span>Severe disability category (ODI)</span><span style="font-weight:700;color:#F97316;">44.4%</span></div>
+                            <div class="bar-track"><div class="bar-fill" style="background:linear-gradient(90deg,#F97316,#fbbf24);" data-width="44"></div></div>
+                        </div>
+                        <div>
+                            <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:#444;margin-bottom:3px;"><span>Mean disability % (avg patient)</span><span style="font-weight:700;color:#34C9B0;">44.5%</span></div>
+                            <div class="bar-track"><div class="bar-fill" style="background:linear-gradient(90deg,#34C9B0,#0B6FAB);" data-width="44.5"></div></div>
+                        </div>
+                        <div>
+                            <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:#444;margin-bottom:3px;"><span>Median pain score (NRS)</span><span style="font-weight:700;color:#7C3AED;">6/10</span></div>
+                            <div class="bar-track"><div class="bar-fill" style="background:linear-gradient(90deg,#7C3AED,#0B6FAB);" data-width="60"></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-l ab-o reveal" style="padding:0.9rem 1.05rem;">
+                    <div style="font-size:0.78rem;font-weight:700;color:#111;margin-bottom:3px;">Equity Insight</div>
+                    <div style="font-size:0.74rem;color:#444;">Manual labor workers: <b>25.6%</b> "crippled" ODI; ages 70–75: <b>34.6%</b> crippled status; ages 40–45 (working-age peak): <b>30.8%</b> — confirming the need for occupation-aware, equity-monitored recommendations.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════ SLIDE 6: POC PERFORMANCE ══════════ -->
+<div class="slide" data-slide="6">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:300px;height:300px;top:-55px;right:-48px;background:#E0176C;opacity:0.03;"></div>
+        <div class="blob" style="width:200px;height:200px;bottom:-44px;left:-34px;background:#E0176C;opacity:0.03;"></div>
+    </div>
+    <div class="content">
+        <div class="reveal"><span class="pill">Proof of Concept Results</span></div>
+        <h2 class="font-display reveal" style="font-size:clamp(1.8rem,3.5vw,2.6rem);margin:0.5rem 0 1rem;color:#111;">POC: Rule Engine + Supervised ML Validation</h2>
+        <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:20px;align-items:start;">
+            <div style="display:flex;flex-direction:column;gap:11px;">
+                <div class="card-l reveal" style="padding:1rem 1.1rem;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                        <span style="font-size:0.76rem;font-weight:700;color:#111;">Model Agreement (LR vs. Rule)</span>
+                        <span style="font-size:0.78rem;font-weight:800;color:#0B6FAB;">81%</span>
+                    </div>
+                    <div class="bar-track"><div class="bar-fill" data-width="81"></div></div>
+                    <div style="font-size:0.68rem;color:#6082a3;margin-top:5px;">Logistic regression on 80/20 stratified split; reflects rule learnability, not clinical prediction accuracy</div>
+                </div>
+                <div class="card-l reveal" style="padding:1rem 1.1rem;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                        <span style="font-size:0.76rem;font-weight:700;color:#111;">Required Field Completeness</span>
+                        <span style="font-size:0.78rem;font-weight:800;color:#34C9B0;">100%</span>
+                    </div>
+                    <div class="bar-track"><div class="bar-fill" style="background:linear-gradient(90deg,#34C9B0,#0B6FAB);" data-width="100"></div></div>
+                </div>
+                <div class="card-l reveal" style="padding:1rem 1.1rem;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                        <span style="font-size:0.76rem;font-weight:700;color:#111;">Pathway Traceability</span>
+                        <span style="font-size:0.78rem;font-weight:800;color:#0B6FAB;">100%</span>
+                    </div>
+                    <div class="bar-track"><div class="bar-fill" data-width="100"></div></div>
+                    <div style="font-size:0.68rem;color:#6082a3;margin-top:5px;">Every assignment traceable to explicit conditional logic</div>
+                </div>
+                <div class="card-l reveal" style="padding:1rem 1.1rem;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                        <span style="font-size:0.76rem;font-weight:700;color:#111;">Clinician Acceptance (Target)</span>
+                        <span style="font-size:0.78rem;font-weight:800;color:#F97316;">≥70% (Ph.2)</span>
+                    </div>
+                    <div class="bar-track"><div class="bar-fill" style="background:linear-gradient(90deg,#F97316,#fbbf24);" data-width="70"></div></div>
+                    <div style="font-size:0.68rem;color:#6082a3;margin-top:5px;">Independent PT review planned for Phase 2 (Cohen's Kappa)</div>
+                </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:11px;">
+                <div class="card-l ab reveal" style="padding:1rem 1.1rem;">
+                    <div style="font-size:0.78rem;font-weight:700;color:#111;margin-bottom:6px;">4 Treatment Pathways Assigned</div>
+                    <div style="display:flex;flex-direction:column;gap:5px;">
+                        <div style="font-size:0.73rem;color:#444;padding:4px 8px;background:rgba(11,111,171,0.06);border-radius:6px;"><b>Acute Mild/Moderate</b> — pain &lt;2 wks, VAS &lt;7, ODI &lt;40%</div>
+                        <div style="font-size:0.73rem;color:#444;padding:4px 8px;background:rgba(11,111,171,0.06);border-radius:6px;"><b>Acute Severe</b> — pain &lt;2 wks, VAS ≥7 or ODI ≥40%</div>
+                        <div style="font-size:0.73rem;color:#444;padding:4px 8px;background:rgba(52,201,176,0.08);border-radius:6px;"><b>Subacute</b> — pain 2–12 weeks</div>
+                        <div style="font-size:0.73rem;color:#444;padding:4px 8px;background:rgba(249,115,22,0.08);border-radius:6px;"><b>Chronic</b> — pain &gt;12 wks, ODI ≥60% → most intensive</div>
+                    </div>
+                </div>
+                <div class="card-l ab-t reveal" style="padding:1rem 1.1rem;">
+                    <div style="font-size:0.78rem;font-weight:700;color:#111;margin-bottom:4px;">Clinical Validation Insight</div>
+                    <div style="font-size:0.74rem;color:#444;">Strong positive correlation confirmed: no mild-pain patient maps to "crippled" — pain severity perfectly predicts disability tier in the synthetic cohort, validating rule engine logic.</div>
+                </div>
+                <div class="card-l ab-o reveal" style="padding:1rem 1.1rem;">
+                    <div style="font-size:0.78rem;font-weight:700;color:#111;margin-bottom:4px;">Honest Limitation</div>
+                    <div style="font-size:0.74rem;color:#444;">LR labels are rule-derived, not independent clinical outcomes. Phase 3 resolves this with real follow-up data. POC scope: feasibility, not clinical prediction validity.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════ SLIDE 7: STRATEGIC LANDSCAPE ══════════ -->
+<div class="slide" data-slide="7">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:300px;height:300px;top:-58px;right:-50px;background:#E0176C;opacity:0.04;"></div>
+        <div class="blob" style="width:200px;height:200px;bottom:-44px;left:-34px;background:#E0176C;opacity:0.03;"></div>
+    </div>
+    <div class="content">
+        <div class="reveal"><span class="pill">Market &amp; Competitive Position</span></div>
+        <h2 class="font-display reveal" style="font-size:clamp(1.8rem,3.5vw,2.6rem);margin:0.5rem 0 1rem;color:#111;">Fyxical Occupies a Differentiated Niche</h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:14px;">
+            <div class="card-l reveal" style="padding:1rem 1.1rem;">
+                <div style="font-size:0.78rem;font-weight:700;color:#111;margin-bottom:8px;">🎯 Competitive Differentiation</div>
+                <div style="display:flex;flex-direction:column;gap:6px;">
+                    <div style="font-size:0.74rem;color:#444;padding:4px 8px;background:rgba(11,111,171,0.06);border-radius:5px;"><b>Hinge Health</b> — virtual, employer/payer focused; not in-clinic</div>
+                    <div style="font-size:0.74rem;color:#444;padding:4px 8px;background:rgba(11,111,171,0.06);border-radius:5px;"><b>PhyxUp / Medbridge</b> — RTM &amp; documentation; no cohort-based triage</div>
+                    <div style="font-size:0.74rem;color:#444;padding:4px 8px;background:rgba(52,201,176,0.10);border-radius:5px;"><b>Fyxical</b> — in-clinic, therapist-in-loop, cohort-based exercise + progression with explainable AI</div>
+                </div>
+            </div>
+            <div class="card-l reveal" style="padding:1rem 1.1rem;">
+                <div style="font-size:0.78rem;font-weight:700;color:#111;margin-bottom:8px;">📈 Market Tailwinds</div>
+                <div style="display:flex;flex-direction:column;gap:6px;">
+                    <div style="font-size:0.74rem;color:#444;">Value-based care push creates demand for outcome-linked platforms</div>
+                    <div style="font-size:0.74rem;color:#444;">Aging US population driving sustained PT demand over next decade</div>
+                    <div style="font-size:0.74rem;color:#444;">FDA AI-SaMD guidance increasing trust in explainable clinical ML</div>
+                    <div style="font-size:0.74rem;color:#444;">NIH HEAL Initiative directly funds LBP analytics &amp; pain phenotyping</div>
+                </div>
+            </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+            <div class="card-l reveal" style="padding:0.9rem;text-align:center;">
+                <div style="font-size:0.70rem;font-weight:700;color:#111;margin-bottom:3px;">Rivalry</div>
+                <div style="font-size:0.76rem;font-weight:800;color:#34C9B0;">Low-Moderate</div>
+                <div style="font-size:0.67rem;color:#6082a3;">No direct in-clinic cohort triage competitor</div>
+            </div>
+            <div class="card-l reveal" style="padding:0.9rem;text-align:center;">
+                <div style="font-size:0.70rem;font-weight:700;color:#111;margin-bottom:3px;">New Entrants</div>
+                <div style="font-size:0.76rem;font-weight:800;color:#F97316;">Moderate-High</div>
+                <div style="font-size:0.67rem;color:#6082a3;">Low-code AI lowers barriers</div>
+            </div>
+            <div class="card-l reveal" style="padding:0.9rem;text-align:center;">
+                <div style="font-size:0.70rem;font-weight:700;color:#111;margin-bottom:3px;">Buyers</div>
+                <div style="font-size:0.76rem;font-weight:800;color:#0B6FAB;">Moderate</div>
+                <div style="font-size:0.67rem;color:#6082a3;">Fragmented clinics; chains have leverage</div>
+            </div>
+            <div class="card-l reveal" style="padding:0.9rem;text-align:center;">
+                <div style="font-size:0.70rem;font-weight:700;color:#111;margin-bottom:3px;">Substitutes</div>
+                <div style="font-size:0.76rem;font-weight:800;color:#7C3AED;">Moderate</div>
+                <div style="font-size:0.67rem;color:#6082a3;">EMRs, RTM, AI scribes compete for budget</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════ SLIDE 8: CLINICAL TRIAL ROADMAP ══════════ -->
+<div class="slide" data-slide="8">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:280px;height:280px;top:-50px;right:-44px;background:#E0176C;opacity:0.03;"></div>
+        <div class="blob" style="width:200px;height:200px;bottom:-42px;left:-32px;background:#E0176C;opacity:0.03;"></div>
+    </div>
+    <div class="content">
+        <div class="reveal"><span class="pill">Scale-Up Roadmap</span></div>
+        <h2 class="font-display reveal" style="font-size:clamp(1.8rem,3.5vw,2.6rem);margin:0.5rem 0 1rem;color:#111;">From POC to Clinical Trial — 4-Phase Plan</h2>
+        <div style="position:relative;padding-left:42px;">
+            <div class="tl-line"></div>
+            <div style="display:flex;flex-direction:column;gap:11px;">
+                <div class="reveal" style="display:flex;align-items:flex-start;gap:14px;">
+                    <div class="t-dot" style="margin-top:3px;flex-shrink:0;position:relative;left:-30px;"></div>
+                    <div class="card-l" style="padding:0.8rem 1rem;flex:1;margin-left:-12px;">
+                        <div style="font-size:0.69rem;font-weight:700;color:#0B6FAB;text-transform:uppercase;letter-spacing:0.07em;">Phase 2 · 3–6 Months — Outcome Infrastructure</div>
+                        <div style="font-size:0.76rem;color:#444;">Expand dataset with real/pilot follow-up outcomes (pain score Δ, ROM, ODI deltas). Add progression pathway logic. IRB approval initiated concurrently. Existing BigQuery + Vertex AI tables already structured for expansion.</div>
+                    </div>
+                </div>
+                <div class="reveal" style="display:flex;align-items:flex-start;gap:14px;">
+                    <div class="t-dot" style="margin-top:3px;flex-shrink:0;position:relative;left:-30px;background:linear-gradient(135deg,#34C9B0,#0B6FAB);"></div>
+                    <div class="card-l" style="padding:0.8rem 1rem;flex:1;margin-left:-12px;">
+                        <div style="font-size:0.69rem;font-weight:700;color:#34C9B0;text-transform:uppercase;letter-spacing:0.07em;">Phase 3 · 6–12 Months — Supervised Model &amp; Clinician Validation</div>
+                        <div style="font-size:0.76rem;color:#444;">Train on real clinical outcome labels (not rule-derived). Introduce cost-sensitive metrics penalizing false downgrades 3–5× more than false upgrades. Conduct PT review (Cohen's Kappa ≥70% agreement target). Enroll n=300 pilot patients.</div>
+                    </div>
+                </div>
+                <div class="reveal" style="display:flex;align-items:flex-start;gap:14px;">
+                    <div class="t-dot" style="margin-top:3px;flex-shrink:0;position:relative;left:-30px;background:linear-gradient(135deg,#F97316,#fbbf24);"></div>
+                    <div class="card-l" style="padding:0.8rem 1rem;flex:1;margin-left:-12px;">
+                        <div style="font-size:0.69rem;font-weight:700;color:#F97316;text-transform:uppercase;letter-spacing:0.07em;">Phase 4 · 12–24 Months — Multi-Clinic Deployment &amp; NIH Clinical Trial</div>
+                        <div style="font-size:0.76rem;color:#444;">Deploy across 2+ outpatient PT sites. Continuous model retraining with outcome feedback loops. Equity monitoring dashboards live. Formal NIH Phase I trial: n=500+ patients, 6-month follow-up, peer-reviewed publication.</div>
+                    </div>
+                </div>
+                <div class="reveal" style="display:flex;align-items:flex-start;gap:14px;">
+                    <div class="t-dot" style="margin-top:3px;flex-shrink:0;position:relative;left:-30px;background:linear-gradient(135deg,#7C3AED,#0B6FAB);"></div>
+                    <div class="card-l" style="padding:0.8rem 1rem;flex:1;margin-left:-12px;">
+                        <div style="font-size:0.69rem;font-weight:700;color:#7C3AED;text-transform:uppercase;letter-spacing:0.07em;">Long-Term · 24–36 Months — Commercial Scale &amp; SaMD Pathway</div>
+                        <div style="font-size:0.76rem;color:#444;">EHR API integrations (HL7 FHIR / LOINC). HIPAA BAA GCP transition. FDA SaMD lifecycle management. Payer value-based care partnerships. Head of Commercial + Regulatory Lead hired.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════ SLIDE 9: COST & ROI ══════════ -->
+<div class="slide" data-slide="9">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:290px;height:290px;top:-52px;right:-47px;background:#E0176C;opacity:0.04;"></div>
+        <div class="blob" style="width:200px;height:200px;bottom:-43px;left:-33px;background:#F97316;opacity:0.07;"></div>
+    </div>
+    <div class="content">
+        <div class="reveal"><span class="pill">Financial Case</span></div>
+        <h2 class="font-display reveal" style="font-size:clamp(1.8rem,3.5vw,2.6rem);margin:0.5rem 0 1rem;color:#111;">Capital-Efficient POC With Clear ROI Path</h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+            <div style="display:flex;flex-direction:column;gap:11px;">
+                <div class="card-l reveal" style="padding:1rem 1.1rem;">
+                    <div style="font-size:0.78rem;font-weight:700;color:#111;margin-bottom:8px;">POC Cost Summary</div>
+                    <div style="display:flex;flex-direction:column;gap:6px;">
+                        <div style="display:flex;justify-content:space-between;font-size:0.74rem;color:#444;padding:4px 8px;background:rgba(224,23,108,0.04);border-radius:5px;"><span>Software &amp; Cloud (GCP free tier + Looker)</span><span style="font-weight:700;color:#34C9B0;">$0</span></div>
+                        <div style="display:flex;justify-content:space-between;font-size:0.74rem;color:#444;padding:4px 8px;background:rgba(224,23,108,0.04);border-radius:5px;"><span>Compliance &amp; Security Labor</span><span style="font-weight:700;color:#F97316;">$500</span></div>
+                        <div style="display:flex;justify-content:space-between;font-size:0.74rem;color:#444;padding:4px 8px;background:rgba(224,23,108,0.07);border-radius:5px;font-weight:700;"><span>TOTAL POC COST</span><span style="color:#0B6FAB;">$500</span></div>
+                    </div>
+                </div>
+                <div class="card-l reveal" style="padding:1rem 1.1rem;">
+                    <div style="font-size:0.78rem;font-weight:700;color:#111;margin-bottom:8px;">Projected Benefits</div>
+                    <div style="display:flex;flex-direction:column;gap:5px;">
+                        <div style="display:flex;justify-content:space-between;font-size:0.74rem;color:#444;"><span>PT Innovation Grant (Foundation for PT Research)</span><span style="font-weight:700;color:#0B6FAB;">$40,000</span></div>
+                        <div style="display:flex;justify-content:space-between;font-size:0.74rem;color:#444;"><span>Clinical efficiency (automated ODI tracking)</span><span style="font-weight:700;color:#34C9B0;">$1,667</span></div>
+                        <div style="display:flex;justify-content:space-between;font-size:0.74rem;color:#444;"><span>Patient attrition prevention</span><span style="font-weight:700;color:#34C9B0;">$5,000</span></div>
+                        <div style="display:flex;justify-content:space-between;font-size:0.74rem;color:#444;font-weight:700;"><span>TOTAL BENEFITS</span><span style="color:#0B6FAB;">$46,667</span></div>
+                    </div>
+                </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:11px;">
+                <div class="card-l reveal" style="padding:1.1rem;text-align:center;border:2px solid rgba(11,111,171,0.16);">
+                    <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:#6082a3;font-weight:700;margin-bottom:5px;">Benefit-to-Cost Ratio</div>
+                    <div class="stat-n glow-pulse" style="font-size:2.8rem;" data-count="93" data-suffix=":1">0:1</div>
+                    <div style="font-size:0.69rem;color:#6082a3;margin-top:4px;">Operational ROI: 1,233%</div>
+                </div>
+                <div class="card-l ab-t reveal" style="padding:1rem 1.1rem;">
+                    <div style="font-size:0.78rem;font-weight:700;color:#111;margin-bottom:4px;">Strategic ROI: 3×–10× Valuation Uplift</div>
+                    <div style="font-size:0.74rem;color:#444;">A validated clinical workflow + approved trial protocol is a significant valuation inflection point for seed funding. <b>222 patients in "severe" ODI category</b> provide direct justification for NIH/PCORI grant award.</div>
+                </div>
+                <div class="card-l ab-o reveal" style="padding:1rem 1.1rem;">
+                    <div style="font-size:0.78rem;font-weight:700;color:#111;margin-bottom:4px;">🎯 Grant Target: $40K Seed → NIH R21</div>
+                    <div style="font-size:0.74rem;color:#444;">Phase I seed from PT Innovation Grant unlocks proof for NIH R21 / PCORI / HEAL Initiative application — targeting $250K–$1M for Phase 3 multi-clinic deployment.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════ SLIDE 10: CALL TO ACTION ══════════ -->
+<div class="slide dark-slide" data-slide="10">
+    <div class="gradient-mesh">
+        <div class="blob" style="width:480px;height:480px;top:-100px;right:-80px;background:#E0176C;opacity:0.20;"></div>
+        <div class="blob" style="width:320px;height:320px;bottom:-80px;left:-60px;background:#ff6aa7;opacity:0.15;"></div>
+        <div class="blob" style="width:200px;height:200px;top:40%;left:14%;background:#b8004d;opacity:0.10;"></div>
+    </div>
+    <canvas class="particle-canvas" style="position:absolute;inset:0;z-index:1;"></canvas>
+    <div class="content text-center">
+        <div style="font-size:78px;line-height:1;margin-bottom:0.5rem;animation:float 3.2s ease-in-out infinite;">🎯</div>
+        <div class="reveal" style="margin-bottom:0.8rem;"><span class="pill" style="background:rgba(255,255,255,0.15);color:#fff;">Our Ask</span></div>
+        <h2 class="font-display reveal" style="font-size:clamp(1.9rem,4.2vw,3.2rem);color:#fff;margin-bottom:0.8rem;text-shadow:0 2px 20px rgba(0,0,0,0.3);line-height:1.15;">Help Us Move From<br>Proof of Concept to Clinical Reality</h2>
+        <p class="reveal" style="font-size:0.86rem;color:rgba(255,255,255,0.68);max-width:580px;margin:0 auto 1.3rem;line-height:1.7;">We are requesting <b style="color:#9aeee2;">$40,000 in seed grant funding</b> from NIH, PCORI, or PT Innovation grant partners to advance Fyxical from our validated POC to a Phase 2 clinical pilot — with a clear pathway to NIH R21 funding for full-scale multi-site trials.</p>
+        <div class="reveal" style="display:inline-grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:680px;margin:0 auto;">
+            <div style="background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.16);border-radius:12px;padding:0.85rem 0.6rem;text-align:center;">
+                <div style="font-size:1.5rem;font-weight:800;color:#fff;font-family:'DM Serif Display',serif;">81%</div>
+                <div style="font-size:0.64rem;color:rgba(255,255,255,0.60);text-transform:uppercase;letter-spacing:0.07em;font-weight:600;margin-top:2px;">Model Agreement<br>(POC)</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.16);border-radius:12px;padding:0.85rem 0.6rem;text-align:center;">
+                <div style="font-size:1.5rem;font-weight:800;color:#9aeee2;font-family:'DM Serif Display',serif;">500</div>
+                <div style="font-size:0.64rem;color:rgba(255,255,255,0.60);text-transform:uppercase;letter-spacing:0.07em;font-weight:600;margin-top:2px;">Synthetic Patients<br>POC Validated</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.16);border-radius:12px;padding:0.85rem 0.6rem;text-align:center;">
+                <div style="font-size:1.5rem;font-weight:800;color:#ffc68e;font-family:'DM Serif Display',serif;">93:1</div>
+                <div style="font-size:0.64rem;color:rgba(255,255,255,0.60);text-transform:uppercase;letter-spacing:0.07em;font-weight:600;margin-top:2px;">Benefit-Cost<br>Ratio</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.16);border-radius:12px;padding:0.85rem 0.6rem;text-align:center;">
+                <div style="font-size:1.5rem;font-weight:800;color:#c4a8ff;font-family:'DM Serif Display',serif;">R21</div>
+                <div style="font-size:0.64rem;color:rgba(255,255,255,0.60);text-transform:uppercase;letter-spacing:0.07em;font-weight:600;margin-top:2px;">Next Phase<br>NIH Target</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div><!-- /.deck -->
+
+<div class="nav-controls">
+    <button class="nav-btn" onclick="changeSlide(-1)">&#8249;</button>
+    <div class="slide-dots" id="dots"></div>
+    <button class="nav-btn" onclick="changeSlide(1)">&#8250;</button>
+    <span class="slide-counter" id="counter">1 / 10</span>
+</div>
+
+<script>
+    let current=1;
+    const total=document.querySelectorAll('.slide').length;
+    const dotsContainer=document.getElementById('dots');
+    const counter=document.getElementById('counter');
+    for(let i=1;i<=total;i++){const dot=document.createElement('div');dot.className='dot'+(i===1?' active':'');dot.onclick=()=>goToSlide(i);dotsContainer.appendChild(dot);}
+    function goToSlide(n){const prev=document.querySelector('.slide.active');const next=document.querySelector(`.slide[data-slide="${n}"]`);if(prev)prev.classList.remove('active');if(next){next.classList.add('active');animateSlide(next);}current=n;updateNav();}
+    function changeSlide(dir){let next=current+dir;if(next<1)next=total;if(next>total)next=1;goToSlide(next);}
+    function updateNav(){document.querySelectorAll('.dot').forEach((d,i)=>{d.classList.toggle('active',i+1===current);});counter.textContent=current+' / '+total;}
+    document.addEventListener('keydown',(e)=>{if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();changeSlide(1);}if(e.key==='ArrowLeft'){e.preventDefault();changeSlide(-1);}});
+    let touchStartX=0;
+    document.addEventListener('touchstart',(e)=>{touchStartX=e.touches[0].clientX;});
+    document.addEventListener('touchend',(e)=>{const diff=touchStartX-e.changedTouches[0].clientX;if(Math.abs(diff)>50)changeSlide(diff>0?1:-1);});
+
+    function animateSlide(slide){
+        slide.querySelectorAll('.reveal').forEach((el,i)=>{
+            el.style.transition='none';el.style.opacity='0';el.style.transform='translateY(18px)';el.offsetHeight;
+            const d=i*0.075;el.style.transition=`opacity 0.38s ease ${d}s,transform 0.38s ease ${d}s`;
+            el.style.opacity='1';el.style.transform='translateY(0)';
+        });
+        animateSlideEffects(slide);
+    }
+
+    function animateSlideEffects(slide){
+        slide.querySelectorAll('[data-count]:not(.counted)').forEach(el=>{
+            el.classList.add('counted');
+            const target=parseInt(el.dataset.count);
+            const suffix=el.dataset.suffix||'',prefix=el.dataset.prefix||'';
+            let cur=0;const step=target/40;
+            const timer=setInterval(()=>{cur+=step;if(cur>=target){cur=target;clearInterval(timer);}
+                el.textContent=prefix+Math.round(cur).toLocaleString()+suffix;
+            },30);
+        });
+        slide.querySelectorAll('.bar-fill:not(.fill-init)').forEach((bar,i)=>{
+            bar.classList.add('fill-init');
+            bar.style.width='0%';bar.style.transition=`width 0.65s ease ${i*0.1}s`;bar.offsetHeight;bar.style.width=bar.dataset.width+'%';
+        });
+    }
+
+    document.addEventListener('mousemove',(e)=>{
+        const s=document.querySelector('.mouse-spotlight');
+        if(s)s.style.background=`radial-gradient(600px circle at ${e.clientX}px ${e.clientY}px,rgba(11,111,171,0.05),transparent 40%)`;
+    });
+
+    (function(){
+        let mx=window.innerWidth/2,my=window.innerHeight/2;
+        document.addEventListener('mousemove',(e)=>{mx=e.clientX;my=e.clientY;});
+        (function tick(){
+            const ox=(mx-window.innerWidth/2)/(window.innerWidth/2),oy=(my-window.innerHeight/2)/(window.innerHeight/2);
+            document.querySelectorAll('.deco-shape').forEach(s=>{const sp=parseFloat(s.dataset.speed)||0.03;s.style.transform=`translate(${ox*sp*100}px,${oy*sp*100}px)`;});
+            requestAnimationFrame(tick);
+        })();
+    })();
+
+    window.initParticles=function(canvas,options){
+        if(!canvas)return;
+        const ctx=canvas.getContext('2d');
+        canvas.width=canvas.offsetWidth;canvas.height=canvas.offsetHeight;
+        const interactive=options.interactive!==false;
+        const count=options.count||(interactive?45:18);
+        let mx=-1000,my=-1000;
+        const particles=Array.from({length:count},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-0.5)*0.3,vy:(Math.random()-0.5)*0.3,size:Math.random()*2.2+0.7,alpha:Math.random()*0.28+0.08}));
+        if(interactive){canvas.addEventListener('mousemove',(e)=>{const r=canvas.getBoundingClientRect();mx=e.clientX-r.left;my=e.clientY-r.top;});canvas.addEventListener('mouseleave',()=>{mx=-1000;my=-1000;});}
+        (function animate(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{if(interactive){const dx=p.x-mx,dy=p.y-my,dist=Math.sqrt(dx*dx+dy*dy);if(dist<100){const f=(100-dist)/100*1.8;p.vx+=(dx/dist)*f*0.1;p.vy+=(dy/dist)*f*0.1;}}p.vx*=0.98;p.vy*=0.98;p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=canvas.width;if(p.x>canvas.width)p.x=0;if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fillStyle=`rgba(200,225,255,${p.alpha})`;ctx.fill();});requestAnimationFrame(animate);})();
+    };
+    document.querySelectorAll('.particle-canvas').forEach(c=>window.initParticles(c,{interactive:true,count:45}));
+    document.querySelectorAll('.particle-canvas-ambient').forEach(c=>window.initParticles(c,{interactive:false,count:18}));
+    try{animateSlide(document.querySelector('.slide.active'));}catch(e){console.warn(e);}
+</script>
+</body>
+</html>
